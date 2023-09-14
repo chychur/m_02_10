@@ -34,7 +34,7 @@ def pictures(request):
 
 
 def remove_picture(request, pic_id):
-    pic = Picture.objects.filter(pk=pic_id) # , user=request.user
+    pic = Picture.objects.filter(pk=pic_id, user=request.user) # , user=request.user
     try:
         os.unlink(os.path.join(settings.MEDIA_ROOT, str(pic.first().path)))
     except OSError as e:
@@ -46,9 +46,9 @@ def remove_picture(request, pic_id):
 def edit_picture(request, pic_id):
     if request.method == "POST":
         description = request.POST["description"]
-        Picture.objects.filter(pk=pic_id).update(description=description)
+        Picture.objects.filter(pk=pic_id, user=request.user).update(description=description)
         return redirect(to="app_instagram:pictures")
 
-    picture = Picture.objects.filter(pk=pic_id).first()
+    picture = Picture.objects.filter(pk=pic_id, user=request.user).first()
     ctx = {"title": "My Instagram", "picture": picture}
     return render(request, "app_instagram/edit.html", context=ctx)

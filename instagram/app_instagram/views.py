@@ -1,6 +1,11 @@
+import os
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .models import Picture
+
 from .forms import PictureForm
+from .models import Picture
 
 
 # Create your views here.
@@ -27,3 +32,23 @@ def pictures(request):
     pictures = Picture.objects.all()
     return render(request, "app_instagram/pictures.html", context={"title": "My Instagram", "pictures": pictures})
 
+
+def remove_picture(request, pic_id):
+    pic = Picture.objects.filter(pk=pic_id) # , user=request.user
+    try:
+        os.unlink(os.path.join(settings.MEDIA_ROOT, str(pic.first().path)))
+    except OSError as e:
+        print(e)
+    pic.delete()
+    return redirect(to="app_instagram:pictures")
+
+
+def edit_picture(request, pic_id):
+    if request.method == "POST":
+        description = request.POST["description"]
+        Picture.objects.filter(pk=pic_id).update(description=description)
+        return redirect(to="app_instagram:pictures")
+
+    picture = Picture.objects.filter(pk=pic_id).first()
+    ctx = {"title": "My Instagram", "picture": picture}
+    return render(request, "app_instagram/edit.html", context=ctx)

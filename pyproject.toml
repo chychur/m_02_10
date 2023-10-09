@@ -10,6 +10,7 @@ packages = [{include = "m_02_10"}]
 python = "^3.11"
 django = "^4.2.5"
 pillow = "^10.0.0"
+environ = "^1.0"
 
 
 [build-system]
